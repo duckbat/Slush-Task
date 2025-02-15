@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import CustomError from './classes/CustomError';
 import { ErrorResponse } from './types/Messages';
+import { TokenContent } from './types/postTypes';
+import jwt from 'jsonwebtoken';
 
 
 const notFound = (req: Request, res: Response, next: NextFunction) => {
@@ -22,4 +24,30 @@ const errorHandler = (
   });
 };
 
-export { notFound, errorHandler };
+const authenticate = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader?.startsWith('Bearer ')) {
+        next(new CustomError('Token missing or invalid', 401));
+        return;
+      }
+  
+      const token = authHeader.split(' ')[1];
+      const decodedToken = jwt.verify(
+        token,
+        process.env.JWT_SECRET || 'your_jwt_secret'
+      ) as TokenContent;
+  
+      res.locals.user = decodedToken;
+      next();
+    } catch (error) {
+      next(new CustomError('Token invalid', 401));
+    }
+  };
+  
+
+export { notFound, errorHandler, authenticate };

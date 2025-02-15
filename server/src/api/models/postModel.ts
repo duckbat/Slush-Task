@@ -1,5 +1,6 @@
 import pool from "../../utils/db";
-import { Post, TokenContent } from "../../types/postTypes";
+import { TokenContent } from "../../types/postTypes";
+import { Post } from "../../types/dbTypes";
 
 /**
  * Get all posts from database

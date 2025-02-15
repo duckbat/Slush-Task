@@ -1,12 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import pool from "../../utils/db";
-import {
-  Post,
-  TokenContent,
-  PostResponse,
-  MessageResponse,
-} from "../../types/postTypes";
+import { TokenContent, PostResponse } from "../../types/postTypes";
 import CustomError from "../../classes/CustomError";
+import { Post } from "../../types/dbTypes";
+import { MessageResponse } from "../../types/Messages";
+import * as postModel from "../models/postModel";
 
 /**
  * Get all posts controller
@@ -17,15 +14,12 @@ const getAllPosts = async (
   next: NextFunction
 ) => {
   try {
-    const result = await pool.query<Post>(
-      "SELECT * FROM posts ORDER BY created_at DESC"
-    );
-    if (result.rows.length === 0) {
-      const error = new CustomError("No posts found", 404);
-      next(error);
+    const posts = await postModel.fetchAllPosts();
+    if (!posts) {
+      next(new CustomError("No posts found", 404));
       return;
     }
-    res.json(result.rows);
+    res.json(posts);
   } catch (error) {
     next(error);
   }
@@ -41,15 +35,12 @@ const getPostById = async (
 ) => {
   try {
     const id = Number(req.params.id);
-    const result = await pool.query<Post>("SELECT * FROM posts WHERE id = $1", [
-      id,
-    ]);
-    if (result.rows.length === 0) {
-      const error = new CustomError("Post not found", 404);
-      next(error);
+    const post = await postModel.fetchPostById(id);
+    if (!post) {
+      next(new CustomError("Post not found", 404));
       return;
     }
-    res.json(result.rows[0]);
+    res.json(post);
   } catch (error) {
     next(error);
   }
@@ -64,20 +55,26 @@ const createPost = async (
   next: NextFunction
 ) => {
   try {
-    req.body.user_id = res.locals.user.user_id;
-    const result = await pool.query<Post>(
-      "INSERT INTO posts (title, content, user_id) VALUES ($1, $2, $3) RETURNING *",
-      [req.body.title, req.body.content, req.body.user_id]
-    );
-
-    if (result.rows.length === 0) {
-      const error = new CustomError("Post creation failed", 500);
-      next(error);
+    if (!res.locals.user) {
+      next(new CustomError("Authentication required", 401));
       return;
     }
-    res
-      .status(201)
-      .json({ message: "Post created successfully", post: result.rows[0] });
+
+    const postData = {
+      ...req.body,
+      user_id: res.locals.user.user_id,
+    };
+
+    const post = await postModel.createPost(postData);
+    if (!post) {
+      next(new CustomError("Post creation failed", 500));
+      return;
+    }
+
+    res.status(201).json({
+      message: "Post created successfully",
+      post: post,
+    });
   } catch (error) {
     next(error);
   }
@@ -92,18 +89,19 @@ const updatePost = async (
   next: NextFunction
 ) => {
   try {
-    const id = Number(req.params.id);
-    const result = await pool.query<Post>(
-      "UPDATE posts SET title = $1, content = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3 AND user_id = $4 RETURNING *",
-      [req.body.title, req.body.content, id, res.locals.user.user_id]
-    );
-
-    if (result.rows.length === 0) {
-      const error = new CustomError("Post update failed", 404);
-      next(error);
+    if (!res.locals.user) {
+      next(new CustomError("Authentication required", 401));
       return;
     }
-    res.json({ message: "Post updated successfully", post: result.rows[0] });
+
+    const id = Number(req.params.id);
+    const post = await postModel.updatePost(id, req.body, res.locals.user);
+
+    if (!post) {
+      next(new CustomError("Post update failed", 404));
+      return;
+    }
+    res.json({ message: "Post updated successfully", post: post });
   } catch (error) {
     next(error);
   }
@@ -118,15 +116,16 @@ const deletePost = async (
   next: NextFunction
 ) => {
   try {
-    const id = Number(req.params.id);
-    const result = await pool.query(
-      "DELETE FROM posts WHERE id = $1 AND user_id = $2",
-      [id, res.locals.user.user_id]
-    );
+    if (!res.locals.user) {
+      next(new CustomError("Authentication required", 401));
+      return;
+    }
 
-    if (result.rowCount === 0) {
-      const error = new CustomError("Post not found or unauthorized", 404);
-      next(error);
+    const id = Number(req.params.id);
+    const result = await postModel.deletePost(id, res.locals.user);
+
+    if (!result) {
+      next(new CustomError("Post not found or unauthorized", 404));
       return;
     }
     res.json({ message: "Post deleted successfully" });

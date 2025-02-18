@@ -11,7 +11,7 @@ describe('App Endpoint Tests', () => {
         .expect(200);
 
       expect(response.body).toEqual({
-        message: 'API location: api/v1'
+        message: 'API location: api/v1', "swagger": "/api-docs",
       });
     });
   });

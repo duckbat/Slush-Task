@@ -5,14 +5,19 @@ import { Post } from "../../types/dbTypes";
 /**
  * Get all posts from database
  */
-export const fetchAllPosts = async (): Promise<Post[] | null> => {
+export const fetchAllPosts = async (): Promise<Post[]> => {
   try {
-    const result = await pool.query<Post>(
-      "SELECT * FROM posts ORDER BY created_at DESC"
-    );
-    if (result.rows.length === 0) {
-      return null;
-    }
+    const query = `
+          SELECT 
+            p.*,
+            u.username,
+            u.email
+          FROM posts p
+          LEFT JOIN users u ON p.user_id = u.id
+          ORDER BY p.created_at DESC
+        `;
+
+    const result = await pool.query(query);
     return result.rows;
   } catch (e) {
     console.error("fetchAllPosts error:", (e as Error).message);
@@ -25,12 +30,16 @@ export const fetchAllPosts = async (): Promise<Post[] | null> => {
  */
 export const fetchPostById = async (id: number): Promise<Post | null> => {
   try {
-    const result = await pool.query<Post>("SELECT * FROM posts WHERE id = $1", [
-      id,
-    ]);
-    if (result.rows.length === 0) {
-      return null;
-    }
+    const query = `
+    SELECT 
+      p.*,
+      u.username
+    FROM posts p
+    LEFT JOIN users u ON p.user_id = u.id
+    WHERE p.id = $1
+  `;
+
+    const result = await pool.query(query, [id]);
     return result.rows[0];
   } catch (e) {
     console.error("fetchPostById error:", (e as Error).message);

@@ -9,14 +9,26 @@ describe("User Endpoints", () => {
     email: "test3@example.com",
     password: "password123",
   };
+  let authToken: string;
 
-  // Create a test user before all tests
+  // Create a test user and get auth token before all tests
   beforeAll(async () => {
-    const res = await request(app).post("/api/v1/user").send(testUser);
+    // Create user
+    const createRes = await request(app).post("/api/v1/user").send(testUser);
 
-    if (res.status === 201) {
-      testUser.id = res.body.user.id;
+    if (createRes.status === 201) {
+      testUser.id = createRes.body.user.id;
     }
+
+    // Login to get token
+    const loginRes = await request(app)
+      .post("/api/v1/auth/login")
+      .send({
+        username: testUser.username,
+        password: testUser.password,
+      });
+
+    authToken = loginRes.body.token;
   });
 
   // Clean up after all tests
@@ -50,12 +62,24 @@ describe("User Endpoints", () => {
     expect(res.body).not.toHaveProperty("password");
   });
 
-  // Test user deletion
-  it("should delete user", async () => {
-    await request(app).delete(`/api/v1/user/${testUser.id}`).expect(200);
+  // Test user deletion with token
+  it("should delete user with valid token", async () => {
+    // Delete user with token
+    await request(app)
+      .delete("/api/v1/user")
+      .set("Authorization", `Bearer ${authToken}`)
+      .expect(200);
 
+    // Verify user is deleted
     const res = await request(app)
       .get(`/api/v1/user/${testUser.id}`)
       .expect(404);
+  });
+
+  // Test user deletion without token
+  it("should not delete user without token", async () => {
+    await request(app)
+      .delete("/api/v1/user")
+      .expect(401);
   });
 });

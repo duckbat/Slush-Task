@@ -171,3 +171,4 @@ npm test
 - Create CI/CD pipeline with *GitHub Actions* for the project
 - Write unit tests for Front-end using *Vitest*
 - Improve UI by adding animation and better styling
+- Use React.Memo to optimize re-renders

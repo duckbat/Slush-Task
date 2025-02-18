@@ -1,4 +1,5 @@
 import pg from "pg";
+require('dotenv').config();
 const { Pool } = pg;
 
 // Create a new connection pool

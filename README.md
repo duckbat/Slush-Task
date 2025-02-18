@@ -36,6 +36,9 @@ The application uses **Express.js** + **TypeScript** for the backend and **React
   - PostgreSQL
   - JWT
 
+- **DB Diagram**:
+  ![DB-Diagram](/db/diagram.png)
+
 ### Testing
 
 - Jest
@@ -60,12 +63,7 @@ The application uses **Express.js** + **TypeScript** for the backend and **React
 createdb Slush_db
 ```
 
-2. Run migrations:
-
-```bash
-cd server
-npm run migrate
-```
+2. User Slush-db.sql in /db folder to paste the database and mock data to PostgreSQL
 
 ### Backend Setup
 

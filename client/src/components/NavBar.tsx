@@ -11,6 +11,11 @@ export const Navigation = ({
 }: NavigationProps) => {
   const navigate = useNavigate();
 
+  const handleLogoutAndReload = () => {
+    handleLogout();
+    window.location.reload();
+  };
+
   return (
     <nav className="bg-white shadow-sm">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -45,7 +50,7 @@ export const Navigation = ({
                 Create Post
               </button>
               <button
-                onClick={handleLogout}
+                onClick={handleLogoutAndReload}
                 className="px-4 py-2 text-red-600 hover:text-red-700"
               >
                 Logout

@@ -6,6 +6,14 @@ This project is a PERN-stack assignment blog application built with TypeScript, 
 
 The application uses **Express.js** + **TypeScript** for the backend and **React** with **TypeScript** for the frontend.
 
+Application is proudly deployed here:
+
+https://slush-task.netlify.app/
+
+You can also check API Documentation here:
+
+https://slush-backend.onrender.com/api-docs
+
 ---
 
 ## Features ✨
@@ -13,9 +21,9 @@ The application uses **Express.js** + **TypeScript** for the backend and **React
 - **User Authentication**: JWT-based authentication system
 - **Post Management**: Create, read, update, and delete blog posts
 - **User Profiles**: Create and Login with user profiles
-- **Responsive Design**: Mobile-first approach u	sing Tailwind CSS
+- **Responsive Design**: Mobile-first approach using Tailwind CSS
 - **API Documentation**: Swagger documentation for backend API
-- **Testing**: Unit tests for both frontend and backend
+- **Testing**: Unit tests and Insomnia test for backend
 
 ---
 
@@ -24,30 +32,31 @@ The application uses **Express.js** + **TypeScript** for the backend and **React
 ### Core Libraries
 
 - **Frontend**:
-
   - React
   - TypeScript
   - TailwindCSS
   - React Router
 - **Backend**:
-
   - Express.js
   - TypeScript
   - PostgreSQL
   - JWT
+  
+- **Deployment**:
+  - [**Netlify**](https://www.netlify.com/) for Front-end
+  - [**Render**](https://render.com/) for Back-end and PostgreSQL database
 
 - **DB Diagram**:
   ![DB-Diagram](/db/diagram.png)
 
 ### Testing
 
-- Jest
+- Insomnia
 - Supertest
-- React Testing Library
 
 ---
 
-## Setup & Usage 🚀
+## Setup & Usage 🚀 (Locally)
 
 ### Prerequisites
 
@@ -55,7 +64,7 @@ The application uses **Express.js** + **TypeScript** for the backend and **React
 - PostgreSQL
 - npm
 
-### Database Setup
+### Database Setup (Locally)
 
 1. Create a PostgreSQL database:
 
@@ -153,5 +162,12 @@ http://localhost:3000/api-docs
 cd server
 npm test
 ```
+- For **Insomnia** tests, you can use exported **Insomia** JSON file located in ```/db``` folder.
 
 ---
+
+## Further imporvements ✶
+- Use *Zustand* as a state manager
+- Create CI/CD pipeline with *GitHub Actions* for the project
+- Write unit tests for Front-end using *Vitest*
+- Improve UI by adding animation and better styling

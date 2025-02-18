@@ -2,7 +2,7 @@
 
 ## About the Project 💻
 
-This project is a full-stack assignment blog application built with TypeScript, React, and Node.js. It features user authentication, CRUD backend and Blogs functionalitites.
+This project is a PERN-stack assignment blog application built with TypeScript, React, and Node.js. It features user authentication, CRUD backend and Blogs functionalitites.
 
 The application uses **Express.js** + **TypeScript** for the backend and **React** with **TypeScript** for the frontend.
 
